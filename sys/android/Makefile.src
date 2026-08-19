@@ -196,11 +196,11 @@ CSTD = -std=c99
 #LFLAGS =
 
 
-NDK = /path/to/android-ndk-r21e
+NDK = /opt/android-ndk-r27d
 NDK_TOOLCHAIN=${NDK}/toolchains/llvm/prebuilt/linux-x86_64/bin
 
 # Choose an ABI
-ABI = armeabi
+ABI = arm64-v8a
 #ABI = armeabi-v7a
 #ABI = arm64-v8a
 #ABI = x86
