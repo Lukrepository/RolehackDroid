@@ -210,6 +210,29 @@ void destroy_jobject(jstring jstr)
 #define JNICallI(func, ...) (*jEnv)->CallIntMethod(jEnv, jAppInstance, func, ## __VA_ARGS__);
 #define JNICallO(func, ...) (*jEnv)->CallObjectMethod(jEnv, jAppInstance, func, ## __VA_ARGS__);
 
+/*
+ * Rolehack: look up a method only the Rolehack UI has, tolerating its absence.
+ *
+ * GetMethodID() returns NULL *and* leaves a NoSuchMethodError pending when the
+ * Java side lacks the method, and any later JNI call made with an exception
+ * pending is an error -- CheckJNI, on in every debuggable build, aborts the
+ * process.  Built against the stock ForkFront, which has none of these
+ * methods, the game would die at launch.  Clearing the error leaves the ID
+ * NULL; every caller already checks for that, so such a build simply runs as
+ * the plain JodiJodington port.
+ */
+staticfn jmethodID rh_optional_method(const char *name, const char *sig)
+{
+    jmethodID id = (*jEnv)->GetMethodID(jEnv, jApp, name, sig);
+
+    if((*jEnv)->ExceptionCheck(jEnv))
+    {
+        (*jEnv)->ExceptionClear(jEnv);
+        id = 0;
+    }
+    return id;
+}
+
 //____________________________________________________________________________________
 void Java_com_tbd_forkfront_NetHackIO_RunNetHack(JNIEnv* env, jobject thiz, jstring path, jstring username)
 {
@@ -248,10 +271,11 @@ void Java_com_tbd_forkfront_NetHackIO_RunNetHack(JNIEnv* env, jobject thiz, jstr
     jLoadSound = (*jEnv)->GetMethodID(jEnv, jApp, "loadSound", "([B)V");
     jPlaySound = (*jEnv)->GetMethodID(jEnv, jApp, "playSound", "([BI)V");
     jGetDumplogDir = (*jEnv)->GetMethodID(jEnv, jApp, "getDumplogDir", "()Ljava/lang/String;");
-    /* Rolehack: structured status for the mobile interface. */
-    jStatusField = (*jEnv)->GetMethodID(jEnv, jApp, "statusField", "(I[BI)V");
-    jPlayerInfo = (*jEnv)->GetMethodID(jEnv, jApp, "setPlayerInfo", "([B[B[BI)V");
-    jHereContext = (*jEnv)->GetMethodID(jEnv, jApp, "hereContext", "(I[B)V");
+    /* Rolehack: structured status for the mobile interface.  Optional, so a
+       build against the stock ForkFront still runs; see rh_optional_method(). */
+    jStatusField = rh_optional_method("statusField", "(I[BI)V");
+    jPlayerInfo = rh_optional_method("setPlayerInfo", "([B[B[BI)V");
+    jHereContext = rh_optional_method("hereContext", "(I[B)V");
 
     if(!(jReceiveKey && jReceivePosKey && jCreateWindow && jClearWindow && jDisplayWindow &&
             jDestroyWindow && jPutString && jRawPrint && jSetCursorPos && jPrintTile &&
