@@ -178,12 +178,36 @@ static const struct trobj Wizard[] = {
 };
 static const struct trobj Apothecary[] = {
     { QUARTERSTAFF, 0, WEAPON_CLASS, 1, 1, UNDEF_BLESS },
-    { ALCHEMY_SMOCK, 0, ARMOR_CLASS, 1, 1, UNDEF_BLESS },
+    /* the poisoner's weapon: something to dip in the potion of sickness
+       on turn 1, and a ranged answer for a role that cannot take a bite */
+    /* +2 is the exact breakpoint in should_mulch_missile() (dothrow.c):
+       chance = 3 + erosion - spe, and broken = chance > 1 ? rn2(chance)
+       : !rn2(4).  At +0 a dart survives a throw 1 time in 3; at +1, 1 in
+       2; at +2 the formula falls through to the !rn2(4) branch and it
+       survives 3 times in 4 -- and no further enchantment improves that.
+       Ten +2 darts therefore outlast eighteen +0 ones (about 40 throws
+       against 27) and stay recoverable long enough to be a weapon
+       (Lucas, 2026-09-23). */
+    { DART, 2, WEAPON_CLASS, 10, 12, UNDEF_BLESS },
+    { ALCHEMY_SMOCK, 2, ARMOR_CLASS, 1, 1, UNDEF_BLESS },
+    { LEATHER_GLOVES, 1, ARMOR_CLASS, 1, 1, UNDEF_BLESS },
     { POT_HEALING, 0, POTION_CLASS, 2, 2, 0 },
+    /* the thrown half of the stock.  These are the potions monsters throw
+       at the hero (muse.c: MUSE_POT_BLINDNESS / _CONFUSION / _SLEEPING /
+       _ACID), so they are the ones the trade knows how to use as weapons.
+       Paralysis is the fifth of that set and is deliberately absent: a
+       thrown one is a free kill on whatever fails its save. */
     { POT_SICKNESS, 0, POTION_CLASS, 1, 1, 0 },
     { POT_ACID, 0, POTION_CLASS, 1, 1, 0 },
+    { POT_BLINDNESS, 0, POTION_CLASS, 1, 1, 0 },
+    { POT_CONFUSION, 0, POTION_CLASS, 1, 1, 0 },
+    { POT_SLEEPING, 0, POTION_CLASS, 1, 1, 0 },
     { FOOD_RATION, 0, FOOD_CLASS, 2, 2, 0 },
-    { SACK, 0, TOOL_CLASS, 1, 1, 0 },
+    /* an oilskin sack, not a plain one: the Archeologist and Rogue both
+       open with a sack, and no role opens with this.  A waterproof bag is
+       the apothecary's own tool -- it is what keeps the stock dry. */
+    { OILSKIN_SACK, 0, TOOL_CLASS, 1, 1, 0 },
+    { LENSES, 0, TOOL_CLASS, 1, 1, 0 },
     { 0, 0, 0, 0, 0, 0 }
 };
 
@@ -816,7 +840,7 @@ u_init_role(void)
         for (ct = svb.bases[POTION_CLASS];
              objects[ct].oc_class == POTION_CLASS; ct++)
             knows_object(ct, FALSE);
-        knows_object(SACK, FALSE);
+        knows_object(OILSKIN_SACK, FALSE);
         break;
     }
 
