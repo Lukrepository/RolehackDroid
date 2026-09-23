@@ -163,6 +163,10 @@ static jmethodID jAskName;
 static jmethodID jLoadSound;
 static jmethodID jPlaySound;
 static jmethodID jGetDumplogDir;
+/* Rolehack: structured status for the mobile interface. */
+static jmethodID jStatusField;
+static jmethodID jPlayerInfo;
+static jmethodID jHereContext;
 
 static boolean quit_if_possible;
 static boolean restoring_msghistory;
@@ -244,6 +248,10 @@ void Java_com_tbd_forkfront_NetHackIO_RunNetHack(JNIEnv* env, jobject thiz, jstr
     jLoadSound = (*jEnv)->GetMethodID(jEnv, jApp, "loadSound", "([B)V");
     jPlaySound = (*jEnv)->GetMethodID(jEnv, jApp, "playSound", "([BI)V");
     jGetDumplogDir = (*jEnv)->GetMethodID(jEnv, jApp, "getDumplogDir", "()Ljava/lang/String;");
+    /* Rolehack: structured status for the mobile interface. */
+    jStatusField = (*jEnv)->GetMethodID(jEnv, jApp, "statusField", "(I[BI)V");
+    jPlayerInfo = (*jEnv)->GetMethodID(jEnv, jApp, "setPlayerInfo", "([B[B[BI)V");
+    jHereContext = (*jEnv)->GetMethodID(jEnv, jApp, "hereContext", "(I[B)V");
 
     if(!(jReceiveKey && jReceivePosKey && jCreateWindow && jClearWindow && jDisplayWindow &&
             jDestroyWindow && jPutString && jRawPrint && jSetCursorPos && jPrintTile &&
@@ -1045,6 +1053,140 @@ void print_status_field(int idx, boolean first_field)
     }
 }
 
+/*
+ * Rolehack: hand Java the status fields separately, so the mobile interface can
+ * draw an HP bar and a hunger badge instead of re-parsing a formatted line.
+ *
+ * Sent alongside the classic two-row text, never instead of it -- the old status
+ * window keeps working exactly as before.  Values are the same strings the text
+ * rows use, minus the leading spaces the layout adds, so BL_GOLD still arrives
+ * as "$123" and BL_HP as "18".
+ */
+/* Rolehack: what the context strip and the pad's centre cell need to know. */
+#define RH_HERE_OBJECT      0x01
+#define RH_HERE_STAIRS_DOWN 0x02
+#define RH_HERE_STAIRS_UP   0x04
+#define RH_ADJ_CLOSED_DOOR  0x08
+#define RH_ADJ_HOSTILE      0x10
+#define RH_HERE_CONTAINER   0x20
+#define RH_HERE_ALTAR       0x40 /* ROLEHACK: on an altar -- offers Sacrifice */
+
+/*
+ * A non-blocking "what can I do here".
+ *
+ * here_cmd_menu() answers the same questions but is an interactive command --
+ * it builds a menu window and waits for a selection -- so it cannot be called
+ * once a turn just to look.  This asks the same things of the same public state
+ * and returns instead of prompting.
+ */
+staticfn void and_send_here_context(void)
+{
+    int flags = 0;
+    int i;
+    struct monst *hostile = 0;
+    stairway *stway;
+    jbyteArray jmon;
+
+    if(!jHereContext)
+        return;
+
+    /* Status flushes before a level exists during startup and on game over. */
+    if(!program_state.in_moveloop || !isok(u.ux, u.uy))
+        return;
+
+    if(OBJ_AT(u.ux, u.uy))
+    {
+        struct obj *otmp;
+
+        flags |= RH_HERE_OBJECT;
+        for(otmp = svl.level.objects[u.ux][u.uy]; otmp; otmp = otmp->nexthere)
+            if(Is_container(otmp))
+            {
+                flags |= RH_HERE_CONTAINER;
+                break;
+            }
+    }
+
+    stway = stairway_at(u.ux, u.uy);
+    if(stway)
+        flags |= stway->up ? RH_HERE_STAIRS_UP : RH_HERE_STAIRS_DOWN;
+
+    if(IS_ALTAR(levl[u.ux][u.uy].typ))
+        flags |= RH_HERE_ALTAR;
+
+    for(i = 0; i < 8; ++i)
+    {
+        coordxy x = u.ux + xdir[i], y = u.uy + ydir[i];
+        struct monst *mtmp;
+
+        if(!isok(x, y))
+            continue;
+
+        if(levl[x][y].typ == DOOR && (levl[x][y].doormask & D_CLOSED) != 0)
+            flags |= RH_ADJ_CLOSED_DOOR;
+
+        mtmp = m_at(x, y);
+        if(mtmp && !mtmp->mtame && !mtmp->mpeaceful && canspotmon(mtmp))
+        {
+            flags |= RH_ADJ_HOSTILE;
+            if(!hostile)
+                hostile = mtmp;
+        }
+    }
+
+    jmon = create_bytearray(hostile ? mon_nam(hostile) : "");
+    JNICallV(jHereContext, flags, jmon);
+    destroy_jobject(jmon);
+}
+
+staticfn void and_send_status_fields(void)
+{
+    int idx;
+
+    if(!jStatusField)
+        return;
+
+    for(idx = 0; idx < MAXBLSTATS; ++idx)
+    {
+        const char *val;
+        jbyteArray jstr;
+
+        if(idx == BL_CONDITION || !status_activefields[idx])
+            continue;
+
+        val = status_vals[idx];
+        if(!val)
+            continue;
+        while(*val == ' ')
+            ++val;
+
+        jstr = create_bytearray(val);
+        JNICallV(jStatusField, idx, jstr, status_colors[idx] & 0xFF);
+        destroy_jobject(jstr);
+    }
+
+    /* The condition mask travels as an int; the names are Java's to render. */
+    JNICallV(jStatusField, BL_CONDITION, (jbyteArray) 0, (int) active_conditions);
+
+    if(jPlayerInfo)
+    {
+        /*
+         * Role and race are not status fields.  BL_ALIGN carries the alignment
+         * word, but the header's role line also wants "Valkyrie" and "Dwarf".
+         */
+        const char *role = (flags.female && gu.urole.name.f)
+                               ? gu.urole.name.f : gu.urole.name.m;
+        jbyteArray jname = create_bytearray(svp.plname);
+        jbyteArray jrole = create_bytearray(role ? role : "");
+        jbyteArray jrace = create_bytearray(gu.urace.noun ? gu.urace.noun : "");
+        /* Bit 0: wizard mode, so the drawers can offer the debug commands. */
+        JNICallV(jPlayerInfo, jname, jrole, jrace, wizard ? 1 : 0);
+        destroy_jobject(jname);
+        destroy_jobject(jrole);
+        destroy_jobject(jrace);
+    }
+}
+
 void and_status_flush()
 {
     enum statusfields idx, *fieldlist;
@@ -1068,6 +1210,8 @@ void and_status_flush()
     for(i = 0; (idx = fieldorder_line2[i]) != BL_FLUSH; ++i)
         print_status_field(idx, i == 0);
 
+    and_send_status_fields();   /* Rolehack */
+    and_send_here_context();    /* Rolehack */
     and_bot_updated();
 }
 
@@ -2062,9 +2206,12 @@ int do_ext_cmd_text()
 
 int and_get_ext_cmd()
 {
-    if(iflags.extmenu)
-        return do_ext_cmd_menu(FALSE);
-    return do_ext_cmd_text();
+    /*
+     * Rolehack: always menu.  Typing a command name is the worse interaction on
+     * a touch device, and the menu's '*' entry reaches the complete extcmdlist
+     * anyway.  Restore the iflags.extmenu test to get the typed prompt back.
+     */
+    return do_ext_cmd_menu(FALSE);
 }
 
 //____________________________________________________________________________________
