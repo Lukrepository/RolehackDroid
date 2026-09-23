@@ -1,7 +1,15 @@
 include(':app')
 rootProject.name = 'NetHack-Android'
-sourceControl {
-  gitRepository("https://github.com/JodiJodington/ForkFront-Android.git") {
-    producesModule("com.tbd.forkfront:lib")
+
+// Rolehack: the ForkFront UI layer comes from a RolehackFront checkout beside
+// this repo (../../../RolehackFront from sys/android), so the mobile-interface
+// work can be edited and built.  Without that checkout Gradle stops with
+// "included build does not exist" -- deliberately: falling back to the stock
+// UI would build an APK without the Rolehack interface.  Upstream's
+// remote-source dependency is kept in settings.gradle.orig-jodi; restore that
+// file to build against JodiJodington's published ForkFront instead.
+includeBuild('../../../RolehackFront') {
+  dependencySubstitution {
+    substitute module('com.tbd.forkfront:lib') using project(':lib')
   }
 }
