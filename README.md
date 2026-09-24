@@ -1,16 +1,75 @@
-<!-- vim:set filetype=markdown: -->
-# How do I prevent save files from getting corrupted?
-This is unfortunately an annoying thing with modern versions of android. Normally, the app is meant to save and quit when the app is closed, but android may just kill the process in the middle of this saving. This will produce a truncated save file that cannot be reloaded. To prevent this, every time a valid save file is loaded, a backup is made that you can later restore, but that is not ideal since you would still lose all the data from _the last session_. The best way to circumvent this (or at least make it highly unlikely) is to **go to Settings -> Apps -> Nethack 5.0 -> Battery Optimizations and make it's background usage unrestricted**. This app does basically no background processing so I don't know why this is necessary, but @DMC4EVERUCCI said this fixed the problem for them. For more information look at [this thread](https://github.com/JodiJodington/NetHack-Android/issues/19). If you use the old gurrhack version of nethack-android on a modern phone, do this for that app as well since it suffers from the same bug _and_ doesn't make any attempt to backup good save files in case it gets corrupted on the next save attempt.
-If you're below android 14, I don't think you have to do this, but if you see the option maybe do it anyway just to be sure.
+# Rolehack for Android
 
-# What apk file do I get?
-It depends on your hardware. Most people will want to get the arm64-v8a one, but if your system is quite old you may need the armeabi one. As far as I know, phones never used x86 or x86\_64 so that would be for weird android-based devices like old chromebooks and dev consoles.
+Rolehack is a NetHack 5.0 variant built around new roles, with a touch interface designed for two thumbs. This repository is the Android app: [JodiJodington's NetHack 5.0 port](https://github.com/JodiJodington/NetHack-Android) with Rolehack's game changes. It runs the interface from [RolehackFront](https://github.com/Lukrepository/RolehackFront).
 
-# Tracking updates automatically
-you can use something like [Obtanium](https://github.com/ImranR98/Obtainium) for this. You can just point it at this repo and it will take care of everything else.
-Note that I do not plan to put this on any kind of app store because it requires quite a lot of maintenance on my part (I am just one person) and there just really is no benefit that I can see.
+- **`rolehack`** — everything Rolehack. This is the branch to use.
+- **`master`** — upstream, unchanged.
 
-# Verification Info:
-You can use this to verify APK integrity manually with apksigner or with a tool like [AppVerifier](https://github.com/soupslurpr/AppVerifier).
-`com.tbd.NetHack5`
-`A3:93:35:69:6E:26:E5:DD:6C:1B:2D:08:C0:1C:78:A5:71:B9:2F:08:A3:63:5A:A8:9C:21:D9:0D:3A:A0:B8:EF`
+## What's new
+
+- **A fourteenth role, the Apothecary.** Its quest is set at the Royal Mint in Isaac Newton's London. The quest artifact is the Lapis Philosophorum, and the nemesis is the counterfeiter William Chaloner.
+- **Grappling** for Cavemen (`#grapple`). Grip, stun and throw.
+- **The Rolehack interface**, in landscape. Keycaps sit in a terminal case, with the map framed as a screen. There are three colour styles, and the case can be switched off. See the [RolehackFront README](https://github.com/Lukrepository/RolehackFront/blob/rolehack-ui/README.md) for the controls.
+
+## Playing it
+
+You don't need to build anything to play. You need the APK file: an Android app installer.
+
+1. **Get the APK.** There are no public releases yet, so ask Lucas for the file. It is built for 64-bit ARM (`arm64-v8a`), which covers almost every Android phone from the last several years.
+2. **Check for the original NetHack 5 app.** This build still installs as "NetHack 5", under JodiJodington's app ID. If JodiJodington's NetHack 5 is already on your phone, this one will refuse to install over it. Uninstalling the original deletes its saved games.
+3. **Install.** Open the APK from your Files app or browser. Android asks whether to allow installs from that app; allow it, then tap Install.
+4. **Protect your saves.** Go to Settings → Apps → NetHack 5 → Battery and choose **Unrestricted**. Otherwise Android may stop the app while it is saving, and the save is lost (from the [upstream notes](UPSTREAM-README.md)).
+5. **Turn the phone sideways.** The Rolehack interface is landscape-only. In portrait you get the classic button panels.
+6. **Adjust it.** Tap MENU (top right) → Settings → Mobile interface. That screen has the colour style, the case on or off, the fonts, the movement key size, and an overall scale.
+7. **Quit safely.** Either:
+   - use GAME → Save; or
+   - press Home, then wait about half a minute before closing the app or installing an update.
+
+   Never force-stop it mid-game.
+
+## Building it
+
+This is the setup that builds the APK today, on Ubuntu 24.04. WSL2 on Windows works; it is what this was built on.
+
+**You need:**
+
+- `gcc`, `make`, `git` and `curl`;
+- **JDK 17**;
+- the Android SDK command-line tools, with `platforms;android-36` and `build-tools;36.0.0`;
+- the **Android NDK r27d**. The makefiles expect it at `/opt/android-ndk-r27d`.
+
+**RolehackFront must be checked out beside this repository.** The Gradle build includes it from `../../../RolehackFront`, relative to `sys/android`:
+
+```
+somewhere/RolehackDroid     <- this repository, branch rolehack
+somewhere/RolehackFront     <- branch rolehack-ui
+```
+
+```sh
+git clone -b rolehack    https://github.com/Lukrepository/RolehackDroid.git
+git clone -b rolehack-ui https://github.com/Lukrepository/RolehackFront.git
+cd RolehackDroid
+
+# Only if your NDK is somewhere other than /opt/android-ndk-r27d:
+sed -i "s,^NDK = .*,NDK = /path/to/android-ndk-r27d," sys/android/Makefile.src sys/android/Makefile.top
+
+(cd sys/android && sh ./setup.sh)
+make fetch-lua
+make install      # the native game library, into sys/android/app/libs/arm64-v8a/
+
+cd sys/android
+echo "sdk.dir=/path/to/android-sdk" > local.properties
+JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64 ./gradlew assembleDebug
+# -> app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
+
+adb install -r app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
+```
+
+**Changed game data?** If you changed anything the game reads from `dat/` (levels, quest text), raise the number in `sys/android/app/assets/ver`. The app only unpacks its data again when that number changes.
+
+## Credits and licences
+
+- **NetHack 5.0:** the NetHack DevTeam, under the NetHack General Public License (`dat/license`).
+- **NetHack for Android:** gurrhack, with the NetHack 5.0 port by JodiJodington. The upstream README is kept here as [UPSTREAM-README.md](UPSTREAM-README.md).
+- **The ForkFront user interface:** gurrhack and JodiJodington, with the Rolehack interface in [RolehackFront](https://github.com/Lukrepository/RolehackFront). ForkFront has no licence file in its upstream repositories; its copyright remains with its authors.
+- **Rolehack:** Lucas Ruiz.
