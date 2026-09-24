@@ -1094,6 +1094,7 @@ void print_status_field(int idx, boolean first_field)
 #define RH_ADJ_HOSTILE      0x10
 #define RH_HERE_CONTAINER   0x20
 #define RH_HERE_ALTAR       0x40 /* ROLEHACK: on an altar -- offers Sacrifice */
+#define RH_ADJ_OPEN_DOOR    0x80 /* ROLEHACK: an open door beside you, clear to shut -- offers Close */
 
 /*
  * A non-blocking "what can I do here".
@@ -1148,6 +1149,12 @@ staticfn void and_send_here_context(void)
 
         if(levl[x][y].typ == DOOR && (levl[x][y].doormask & D_CLOSED) != 0)
             flags |= RH_ADJ_CLOSED_DOOR;
+        /* ROLEHACK: Close, where doclose() would shut the door -- plainly open,
+         * and nothing seen in the doorway (lock.c's obstructed() refuses an
+         * object or a monster there). */
+        if(levl[x][y].typ == DOOR && levl[x][y].doormask == D_ISOPEN && !OBJ_AT(x, y)
+           && !((mtmp = m_at(x, y)) != 0 && canspotmon(mtmp)))
+            flags |= RH_ADJ_OPEN_DOOR;
 
         mtmp = m_at(x, y);
         if(mtmp && !mtmp->mtame && !mtmp->mpeaceful && canspotmon(mtmp))

@@ -9,7 +9,7 @@ Rolehack is a NetHack 5.0 variant built around new roles, with a touch interface
 
 - **A fourteenth role, the Apothecary.** Its quest is set at the Royal Mint in Isaac Newton's London. The quest artifact is the Lapis Philosophorum, and the nemesis is the counterfeiter William Chaloner.
 - **Grappling** for Cavemen (`#grapple`). Grip, stun and throw.
-- **The Rolehack interface**, in landscape. Keycaps sit in a terminal case, with the map framed as a screen. There are three colour styles, and the case can be switched off. See the [RolehackFront README](https://github.com/Lukrepository/RolehackFront/blob/rolehack-ui/README.md) for the controls.
+- **The Rolehack interface**, in landscape and portrait. Keycaps sit in a terminal case, with the map framed as a screen. There are three colour styles, and the case can be switched off. See the [RolehackFront README](https://github.com/Lukrepository/RolehackFront/blob/rolehack-ui/README.md) for the controls.
 
 ## Playing it
 
@@ -18,7 +18,7 @@ You don't need to build anything to play. You need the APK file: an Android app 
 1. **Get the APK.** There are no public releases yet, so ask Lucas for the file. It is built for 64-bit ARM (`arm64-v8a`), which covers almost every Android phone from the last several years.
 2. **Install.** Open the APK from your Files app or browser. Android asks whether to allow installs from that app; allow it, then tap Install. Google Play Protect may warn that it doesn't recognise the app; choose to install anyway. Rolehack installs as its own app, beside any other NetHack you have, and doesn't touch their saves.
 3. **Protect your saves.** Go to Settings → Apps → Rolehack → Battery and choose **Unrestricted**. Otherwise Android may stop the app while it is saving, and the save is lost (from the [upstream notes](UPSTREAM-README.md)).
-4. **Turn the phone sideways.** The Rolehack interface is landscape-only. In portrait you get the classic button panels.
+4. **Hold it either way.** The interface has a landscape layout and a portrait one, and turning the phone mid-game rearranges it without touching the game. Portrait gives the map more height, which suits narrow levels like Sokoban.
 5. **Adjust it.** Tap MENU (top right) → Settings → Mobile interface. That screen has the colour style, the case on or off, the fonts, the movement key size, and an overall scale.
 6. **Quit with GAME → Save.** That writes a full save and closes the app. If you only switch away, the game keeps a checkpoint instead. If Android then closes the app to free memory, open it again and the game picks up from the checkpoint by itself. Never force-stop it while it's on screen.
 7. **Updating.** Save first (GAME → Save), then open the new APK the same way. It installs over the old one and keeps your game and settings.
