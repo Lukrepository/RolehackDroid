@@ -11,6 +11,9 @@ android {
   buildToolsVersion = "36.0.0"
 
   defaultConfig {
+    // Rolehack's own identity, so it installs beside JodiJodington's NetHack 5.
+    // The namespace above stays: R and ForkFront's resource lookups use it.
+    applicationId = "io.github.lukrepository.rolehack"
     minSdkVersion = 7
     targetSdkVersion = 34
     versionName = '5.0.0'

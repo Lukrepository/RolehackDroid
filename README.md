@@ -16,16 +16,12 @@ Rolehack is a NetHack 5.0 variant built around new roles, with a touch interface
 You don't need to build anything to play. You need the APK file: an Android app installer.
 
 1. **Get the APK.** There are no public releases yet, so ask Lucas for the file. It is built for 64-bit ARM (`arm64-v8a`), which covers almost every Android phone from the last several years.
-2. **Check for the original NetHack 5 app.** This build still installs as "NetHack 5", under JodiJodington's app ID. If JodiJodington's NetHack 5 is already on your phone, this one will refuse to install over it. Uninstalling the original deletes its saved games.
-3. **Install.** Open the APK from your Files app or browser. Android asks whether to allow installs from that app; allow it, then tap Install.
-4. **Protect your saves.** Go to Settings → Apps → NetHack 5 → Battery and choose **Unrestricted**. Otherwise Android may stop the app while it is saving, and the save is lost (from the [upstream notes](UPSTREAM-README.md)).
-5. **Turn the phone sideways.** The Rolehack interface is landscape-only. In portrait you get the classic button panels.
-6. **Adjust it.** Tap MENU (top right) → Settings → Mobile interface. That screen has the colour style, the case on or off, the fonts, the movement key size, and an overall scale.
-7. **Quit safely.** Either:
-   - use GAME → Save; or
-   - press Home, then wait about half a minute before closing the app or installing an update.
-
-   Never force-stop it mid-game.
+2. **Install.** Open the APK from your Files app or browser. Android asks whether to allow installs from that app; allow it, then tap Install. Google Play Protect may warn that it doesn't recognise the app; choose to install anyway. Rolehack installs as its own app, beside any other NetHack you have, and doesn't touch their saves.
+3. **Protect your saves.** Go to Settings → Apps → Rolehack → Battery and choose **Unrestricted**. Otherwise Android may stop the app while it is saving, and the save is lost (from the [upstream notes](UPSTREAM-README.md)).
+4. **Turn the phone sideways.** The Rolehack interface is landscape-only. In portrait you get the classic button panels.
+5. **Adjust it.** Tap MENU (top right) → Settings → Mobile interface. That screen has the colour style, the case on or off, the fonts, the movement key size, and an overall scale.
+6. **Quit with GAME → Save.** That writes a full save and closes the app. If you only switch away, the game keeps a checkpoint instead. If Android then closes the app to free memory, open it again and the game picks up from the checkpoint by itself. Never force-stop it while it's on screen.
+7. **Updating.** Save first (GAME → Save), then open the new APK the same way. It installs over the old one and keeps your game and settings.
 
 ## Building it
 
@@ -65,7 +61,9 @@ JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64 ./gradlew assembleDebug
 adb install -r app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
 ```
 
-**Changed game data?** If you changed anything the game reads from `dat/` (levels, quest text), raise the number in `sys/android/app/assets/ver`. The app only unpacks its data again when that number changes.
+**Changed game data?** If you changed anything the game reads from `dat/` (levels, quest text), raise the number in `sys/android/app/assets/ver` by one. The app only unpacks its data again when that number changes. Stay within the same hundred: going from 1xx to 2xx makes the app delete every saved game and bones file on the phone.
+
+**Signing.** A debug build is signed with your own machine's debug key (`~/.android/debug.keystore`). Android only installs an update signed with the same key, so a copy you built can't replace one someone else built. You would have to uninstall theirs first, and that deletes its saves.
 
 ## Credits and licences
 
