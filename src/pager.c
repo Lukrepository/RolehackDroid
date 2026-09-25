@@ -1,4 +1,5 @@
 /* NetHack 5.0	pager.c	$NHDT-Date: 1781973061 2026/06/20 16:31:01 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.302 $ */
+/* Changed for Rolehack by Lucas Ruiz, 2026-09-25.  See ROLEHACK-CHANGES.md. */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2730,14 +2731,15 @@ docontact(void)
         putstr(cwin, 0, buf);
         putstr(cwin, 0, "");
     }
-    putstr(cwin, 0, "To contact the NetHack development team directly,");
-    /*XXX overflow possibilities*/
-    Sprintf(buf, "see the 'Contact' form on our website or email <%s>.",
-            DEVTEAM_EMAIL);
+    /* ROLEHACK: Rolehack is a variant, so its bugs go to its own tracker;
+       the DevTeam's site is still the place for NetHack itself. */
+    putstr(cwin, 0, "Rolehack is a variant of NetHack, not the NetHack");
+    putstr(cwin, 0, "development team's game.  To report a Rolehack bug,");
+    Sprintf(buf, "open an issue at <%s>.", ROLEHACK_BUGS_URL);
     putstr(cwin, 0, buf);
     putstr(cwin, 0, "");
-    putstr(cwin, 0, "For more information on NetHack, or to report a bug,");
-    Sprintf(buf, "visit our website \"%s\".", DEVTEAM_URL);
+    putstr(cwin, 0, "For more information on NetHack itself,");
+    Sprintf(buf, "visit the NetHack website \"%s\".", DEVTEAM_URL);
     putstr(cwin, 0, buf);
     display_nhwindow(cwin, FALSE);
     destroy_nhwindow(cwin);

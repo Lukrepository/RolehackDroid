@@ -1,0 +1,58 @@
+# Files Rolehack changes
+
+The NetHack General Public License (`dat/license`, section 2a) asks that
+modified files carry notices saying they were changed, and when.  Every file
+below differs from JodiJodington's NetHack 5.0 port (`JodiJodington/NetHack-Android`,
+`master`), which Rolehack is built on.  Each text file also carries a one-line
+notice near its top; files that cannot hold a comment are listed here only.
+The git history holds the full record of what changed.
+
+Dates are when the file changed, from `git log`.  Refresh this list and the
+notices before each release.
+
+| File | | Changed | Notice |
+|---|---|---|---|
+| `dat/Apo-fila.lua` | added | 2026-07-31 to 2026-08-21 | notice in file |
+| `dat/Apo-filb.lua` | added | 2026-07-31 to 2026-08-21 | notice in file |
+| `dat/Apo-goal.lua` | added | 2026-07-31 to 2026-09-23 | notice in file |
+| `dat/Apo-loca.lua` | added | 2026-07-31 to 2026-08-21 | notice in file |
+| `dat/Apo-strt.lua` | added | 2026-07-31 to 2026-08-21 | notice in file |
+| `dat/quest.lua` | changed | 2026-07-31 to 2026-09-23 | notice in file |
+| `include/artifact.h` | changed | 2026-08-21 | notice in file |
+| `include/artilist.h` | changed | 2026-07-31 to 2026-09-23 | notice in file |
+| `include/extern.h` | changed | 2026-08-16 to 2026-08-21 | notice in file |
+| `include/hack.h` | changed | 2026-07-31 to 2026-09-25 | notice in file |
+| `include/monsters.h` | changed | 2026-07-31 to 2026-08-16 | notice in file |
+| `include/obj.h` | changed | 2026-09-23 | notice in file |
+| `include/patchlevel.h` | changed | 2026-09-25 | notice in file |
+| `include/skills.h` | changed | 2026-08-16 | notice in file |
+| `src/artifact.c` | changed | 2026-08-21 to 2026-09-23 | notice in file |
+| `src/attrib.c` | changed | 2026-07-31 | notice in file |
+| `src/cmd.c` | changed | 2026-08-16 | notice in file |
+| `src/end.c` | changed | 2026-08-10 to 2026-09-23 | notice in file |
+| `src/mdlib.c` | changed | 2026-09-25 | notice in file |
+| `src/mon.c` | changed | 2026-08-21 to 2026-09-23 | notice in file |
+| `src/monmove.c` | changed | 2026-09-23 | notice in file |
+| `src/muse.c` | changed | 2026-08-21 | notice in file |
+| `src/pager.c` | changed | 2026-09-25 | notice in file |
+| `src/pline.c` | changed | 2026-09-25 | notice in file |
+| `src/potion.c` | changed | 2026-08-10 to 2026-09-23 | notice in file |
+| `src/quest.c` | changed | 2026-09-23 | notice in file |
+| `src/report.c` | changed | 2026-09-25 | notice in file |
+| `src/role.c` | changed | 2026-07-31 to 2026-09-23 | notice in file |
+| `src/u_init.c` | changed | 2026-07-31 to 2026-09-24 | notice in file |
+| `src/uhitm.c` | changed | 2026-08-16 to 2026-09-23 | notice in file |
+| `src/weapon.c` | changed | 2026-09-23 | notice in file |
+| `sys/android/Makefile.src` | changed | 2026-08-19 | notice in file |
+| `sys/android/Makefile.top` | changed | 2026-08-19 | notice in file |
+| `sys/android/app/AndroidManifest.xml` | changed | 2026-09-24 to 2026-09-25 | notice in file |
+| `sys/android/app/assets/ver` | changed | 2026-08-21 to 2026-09-25 | cannot carry a comment; listed here |
+| `sys/android/app/build.gradle` | changed | 2026-09-24 to 2026-09-25 | notice in file |
+| `sys/android/app/res/drawable-nodpi/default_16x16.png` | changed | 2026-08-19 | cannot carry a comment; listed here |
+| `sys/android/app/res/drawable-nodpi/geoduck_15x25.png` | removed | 2026-08-19 to 2026-09-25 | file deleted |
+| `sys/android/app/res/drawable-nodpi/nevanda_32x32.png` | removed | 2026-08-19 to 2026-09-25 | file deleted |
+| `sys/android/app/res/values/config.xml` | changed | 2026-09-25 | notice in file |
+| `sys/android/app/res/values/tiles.xml` | changed | 2026-09-25 | notice in file |
+| `sys/android/settings.gradle` | changed | 2026-09-23 | notice in file |
+| `sys/android/winandroid.c` | changed | 2026-09-23 to 2026-09-24 | notice in file |
+| `win/share/monsters.txt` | changed | 2026-08-04 to 2026-08-19 | notice in file |

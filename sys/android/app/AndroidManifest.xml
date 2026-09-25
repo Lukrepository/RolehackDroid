@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Changed for Rolehack by Lucas Ruiz, 2026-09-24 to 2026-09-25.  See ROLEHACK-CHANGES.md. -->
 <manifest
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:installLocation="auto">
 	<uses-sdk />
-    <uses-permission android:name="android.permission.INTERNET"/>
 
 	<application
 		android:label="Rolehack"

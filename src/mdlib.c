@@ -1,4 +1,5 @@
 /* NetHack 5.0  mdlib.c  $NHDT-Date: 1781973053 2026/06/20 16:30:53 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.74 $ */
+/* Changed for Rolehack by Lucas Ruiz, 2026-09-25.  See ROLEHACK-CHANGES.md. */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -340,8 +341,11 @@ version_id_string(char *outbuf, size_t bufsz, const char *build_date)
     Strcpy(&subbuf[1], PORT_SUB_ID);
 #endif
 
-    Snprintf(outbuf, bufsz, "%s NetHack%s Version %s%s - last %s %s.",
-             PORT_ID, subbuf, mdlib_version_string(versbuf, "."), statusbuf,
+    /* ROLEHACK: say which game this is, then which NetHack it is built on. */
+    Snprintf(outbuf, bufsz,
+             "%s Rolehack%s Version %s, based on NetHack %s%s - last %s %s.",
+             PORT_ID, subbuf, ROLEHACK_VERSION,
+             mdlib_version_string(versbuf, "."), statusbuf,
              date_via_env ? "revision" : "build", build_date);
     return outbuf;
 }

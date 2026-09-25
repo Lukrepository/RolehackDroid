@@ -1,4 +1,5 @@
 /* NetHack 5.0	patchlevel.h	$NHDT-Date: 1781973085 2026/06/20 16:31:25 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.310 $ */
+/* Changed for Rolehack by Lucas Ruiz, 2026-09-25.  See ROLEHACK-CHANGES.md. */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -7,6 +8,11 @@
 #define PATCHLEVEL_H
 
 /* NetHack 5.0.x */
+/* ROLEHACK: the variant's own version, shown ahead of the NetHack it is
+ * built on (release checklist, 2026-09-25).  Variants number themselves; a
+ * "5.0.1" would read as the DevTeam's next patch release. */
+#define ROLEHACK_VERSION "0.1.0"
+
 #define VERSION_MAJOR 5
 #define VERSION_MINOR 0
 /*

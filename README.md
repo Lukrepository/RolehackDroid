@@ -15,7 +15,7 @@ Rolehack is a NetHack 5.0 variant built around new roles, with a touch interface
 
 You don't need to build anything to play. You need the APK file: an Android app installer.
 
-1. **Get the APK.** There are no public releases yet, so ask Lucas for the file. It is built for 64-bit ARM (`arm64-v8a`), which covers almost every Android phone from the last several years.
+1. **Get the APK.** There are no public releases yet, so ask Lucas for the file. It is built for 64-bit ARM (`arm64-v8a`), which covers almost every Android phone from the last several years, and it needs **Android 11 or newer**. It asks for no permissions: no network, no storage.
 2. **Install.** Open the APK from your Files app or browser. Android asks whether to allow installs from that app; allow it, then tap Install. Google Play Protect may warn that it doesn't recognise the app; choose to install anyway. Rolehack installs as its own app, beside any other NetHack you have, and doesn't touch their saves.
 3. **Protect your saves.** Go to Settings → Apps → Rolehack → Battery and choose **Unrestricted**. Otherwise Android may stop the app while it is saving, and the save is lost (from the [upstream notes](UPSTREAM-README.md)).
 4. **Hold it either way.** The interface has a landscape layout and a portrait one, and turning the phone mid-game rearranges it without touching the game. Portrait gives the map more height, which suits narrow levels like Sokoban.
@@ -64,6 +64,26 @@ adb install -r app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
 **Changed game data?** If you changed anything the game reads from `dat/` (levels, quest text), raise the number in `sys/android/app/assets/ver` by one. The app only unpacks its data again when that number changes. Stay within the same hundred: going from 1xx to 2xx makes the app delete every saved game and bones file on the phone.
 
 **Signing.** A debug build is signed with your own machine's debug key (`~/.android/debug.keystore`). Android only installs an update signed with the same key, so a copy you built can't replace one someone else built. You would have to uninstall theirs first, and that deletes its saves.
+
+**Release builds** are signed with a key that never enters the repository. Make it once, and keep two backups: lose it and no update can ever install over the copies people already have.
+
+```sh
+keytool -genkeypair -v -keystore rolehack-release.jks -alias rolehack \
+        -keyalg RSA -keysize 4096 -validity 10000
+```
+
+Then create `sys/android/keystore.properties` (git ignores it) with:
+
+```
+storeFile=/path/to/rolehack-release.jks
+storePassword=...
+keyAlias=rolehack
+keyPassword=...
+```
+
+and build with `./gradlew assembleRelease`, which gives `app/build/outputs/apk/release/app-arm64-v8a-release.apk`. Without the properties file the release APK comes out unsigned. Check the result with `apksigner verify --print-certs`: the certificate must be your key, not "Android Debug".
+
+**Versions.** `versionName` in `sys/android/app/build.gradle` and `ROLEHACK_VERSION` in `include/patchlevel.h` are Rolehack's own number, and move together. `versionCode` only ever goes up.
 
 ## Credits and licences
 

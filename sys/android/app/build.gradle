@@ -1,6 +1,15 @@
+// Changed for Rolehack by Lucas Ruiz, 2026-09-24 to 2026-09-25.  See ROLEHACK-CHANGES.md.
 plugins {
   id 'com.android.application'
 }
+
+// Release signing (release checklist, 2026-09-25): the key and its passwords
+// live outside the repository, in keystore.properties beside settings.gradle,
+// which git ignores.  Without that file a release build comes out unsigned.
+def keystoreFile = rootProject.file('keystore.properties')
+def keystoreProps = new Properties()
+if (keystoreFile.exists())
+  keystoreFile.withInputStream { keystoreProps.load(it) }
 
 android {
 
@@ -14,15 +23,39 @@ android {
     // Rolehack's own identity, so it installs beside JodiJodington's NetHack 5.
     // The namespace above stays: R and ForkFront's resource lookups use it.
     applicationId = "io.github.lukrepository.rolehack"
-    minSdkVersion = 7
+    // Android 11: the game library is built at API 30 (Makefile.src).
+    minSdkVersion = 30
     targetSdkVersion = 34
-    versionName = '5.0.0'
-    versionCode = 5000
+    // Rolehack's own number; the NetHack it is built on shows in #version.
+    versionName = '0.1.0'
+    // Counts up from 5000, where the inherited builds left it, so every
+    // playtest copy updates in place.
+    versionCode = 5010
   }
 
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+  }
+
+  signingConfigs {
+    release {
+      if (keystoreFile.exists()) {
+        storeFile = file(keystoreProps['storeFile'])
+        storePassword = keystoreProps['storePassword']
+        keyAlias = keystoreProps['keyAlias']
+        keyPassword = keystoreProps['keyPassword']
+      }
+    }
+  }
+
+  buildTypes {
+    release {
+      if (keystoreFile.exists())
+        signingConfig = signingConfigs.release
+      // No shrinking: the game library finds Java methods by name.
+      minifyEnabled = false
+    }
   }
 
   lintOptions {
@@ -42,7 +75,9 @@ android {
     abi {
         enable = true
         reset()
-        include "x86", "x86_64", "armeabi", "arm64-v8a", "armeabi-v7a"
+        // Only the ABI the game library is built for; the others would
+        // install and then fail to find libnethack.so.
+        include "arm64-v8a"
         universalApk = false
     }
   }
