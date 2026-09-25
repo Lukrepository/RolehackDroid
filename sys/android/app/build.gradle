@@ -14,6 +14,17 @@ if (keystoreFile.exists())
 android {
 
   namespace = "com.tbd.NetHack5"
+
+  // The NDK, so the APK carries the game library without its debug symbols
+  // (12.9 MB -> 5.0 MB).  Ours lives outside the SDK, so its path comes from
+  // ANDROID_NDK_HOME; without it the library ships unstripped, as before.  The
+  // unstripped copy stays in libs/ for reading crash traces
+  // (ndk-stack -sym libs/arm64-v8a).
+  // The version must match what is there -- AGP otherwise assumes its own
+  // default (28.2) and refuses the r27d the Makefiles build with.
+  ndkVersion = "27.3.13750724"
+  if (System.getenv('ANDROID_NDK_HOME'))
+    ndkPath = System.getenv('ANDROID_NDK_HOME')
   compileSdk { 
     version = release(36)
   }

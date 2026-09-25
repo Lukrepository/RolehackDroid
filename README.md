@@ -55,6 +55,7 @@ make install      # the native game library, into sys/android/app/libs/arm64-v8a
 
 cd sys/android
 echo "sdk.dir=/path/to/android-sdk" > local.properties
+export ANDROID_NDK_HOME=/opt/android-ndk-r27d   # lets Gradle strip the game library
 JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64 ./gradlew assembleDebug
 # -> app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
 
