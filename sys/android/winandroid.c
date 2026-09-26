@@ -1,5 +1,5 @@
 #include <string.h>
-/* Changed for Rolehack by Lucas Ruiz, 2026-09-23 to 2026-09-25.  See ROLEHACK-CHANGES.md. */
+/* Changed for Rolehack by Lucas Ruiz, 2026-09-23 to 2026-09-26.  See ROLEHACK-CHANGES.md. */
 #include <errno.h>
 #include <jni.h>
 #include <ctype.h>
@@ -1199,6 +1199,10 @@ staticfn void and_send_here_context(void)
  *   mail, for its pauldrons.  All of these are functions of the object type
  *   alone, and none of those appearances is ever shuffled, so they tell
  *   nothing the tile does not.
+ *   A worn cloak carries its style in the low byte, 1-12 (rh_doll_cloak()),
+ *   named by the words the player sees: its description, or its name when
+ *   it has none.  The four magic cloaks shuffle their descriptions per game,
+ *   so the doll draws the "opera cloak", never the cloak of invisibility.
  *   RH_DOLL_FRONT marks the cloak-slot items worn in front of the body --
  *   robe, apron (alchemy smock), mummy wrapping; every other cloak is drawn
  *   as a cape behind it, so it no longer hides the armour (Lucas).  All
@@ -1307,6 +1311,28 @@ staticfn boolean rh_doll_costume(struct obj *obj)
     return FALSE;
 }
 
+/*
+ * A worn cloak's look, by the words the player sees for it (Lucas asked for
+ * cloak art).  Order matches RhDoll's cloak styles; 0 for anything else.
+ */
+staticfn int rh_doll_cloak(struct obj *obj)
+{
+    static const char *const looks[] = {
+        "faded pall", "coarse mantelet", "hooded cloak", "slippery cloak",
+        "leather cloak", "tattered cape", "opera cloak", "ornamental cope",
+        "piece of cloth", "robe", "apron", "mummy wrapping",
+    };
+    const char *look = OBJ_DESCR(objects[obj->otyp]);
+    int i;
+
+    if(!look)   /* robe, leather cloak, mummy wrapping: the name is the look */
+        look = OBJ_NAME(objects[obj->otyp]);
+    for(i = 0; i < SIZE(looks); ++i)
+        if(look && !strcmp(look, looks[i]))
+            return i + 1;
+    return 0;
+}
+
 staticfn void rh_doll_slot(int *out, struct obj *obj, boolean worn)
 {
     glyph_info gi;
@@ -1373,6 +1399,8 @@ staticfn void and_send_hero_look(boolean from_display)
     }
     for(i = 0; i < RH_DOLL_SLOTS; ++i)
         rh_doll_slot(&look[4 + 3 * i], slots[i], i < 9);    /* 9, 10: in hand */
+    if(uarmc)
+        look[4 + 3 * 3 + 2] |= rh_doll_cloak(uarmc);        /* slot 3: the cloak */
     /* Knuth's multiplicative hash, high bits: games started seconds apart
        should not just step through the tones in order. */
     look[RH_DOLL_LEN - 2] = (int) ((((unsigned) ubirthday) * 2654435761U) >> 16);
