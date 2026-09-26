@@ -1,5 +1,5 @@
 /* NetHack 5.0	u_init.c	$NHDT-Date: 1781973071 2026/06/20 16:31:11 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.127 $ */
-/* Changed for Rolehack by Lucas Ruiz, 2026-07-31 to 2026-09-24.  See ROLEHACK-CHANGES.md. */
+/* Changed for Rolehack by Lucas Ruiz, 2026-07-31 to 2026-09-25.  See ROLEHACK-CHANGES.md. */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -196,6 +196,9 @@ static const struct trobj Apothecary[] = {
     { DART, 2, WEAPON_CLASS, 10, 12, UNDEF_BLESS },
     { ALCHEMY_SMOCK, 2, ARMOR_CLASS, 1, 1, UNDEF_BLESS },
     { LEATHER_GLOVES, 1, ARMOR_CLASS, 1, 1, UNDEF_BLESS },
+    /* closed-toed shoes, for safety: the trade is spilt acid and broken
+       glass (Lucas, 2026-09-25) */
+    { HIGH_BOOTS, 0, ARMOR_CLASS, 1, 1, UNDEF_BLESS },
     { POT_HEALING, 0, POTION_CLASS, 2, 2, 0 },
     /* the thrown half of the stock.  These are the potions monsters throw
        at the hero (muse.c: MUSE_POT_BLINDNESS / _CONFUSION / _SLEEPING /

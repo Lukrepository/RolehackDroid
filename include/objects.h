@@ -1,4 +1,5 @@
 /* NetHack 5.0	objects.h	$NHDT-Date: 1781973085 2026/06/20 16:31:25 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.39 $ */
+/* Changed for Rolehack by Lucas Ruiz, 2026-09-25.  See ROLEHACK-CHANGES.md. */
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -627,8 +628,9 @@ CLOAK("robe", NoDes,
       1, 1,          0,  6, 0, 15, 50,  8, 2,  CLOTH, CLR_RED, ROBE),
         /* robe was adopted from slash'em, where it's worn as a suit
            rather than as a cloak and there are several variations */
+/* ROLEHACK: green, for the apron Walter White cooks in (Lucas, 2026-09-25) */
 CLOAK("alchemy smock", "apron",
-      0, 1, POISON_RES, 11, 0, 10, 50,  9, 1,  CLOTH, CLR_WHITE,
+      0, 1, POISON_RES, 11, 0, 10, 50,  9, 1,  CLOTH, CLR_GREEN,
                                                         ALCHEMY_SMOCK),
 CLOAK("leather cloak", NoDes,
       1, 0,          0,  8, 0, 15, 40,  9, 1,  LEATHER, CLR_BROWN,

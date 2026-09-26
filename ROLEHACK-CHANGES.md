@@ -17,13 +17,17 @@ notices before each release.
 | `dat/Apo-goal.lua` | added | 2026-07-31 to 2026-09-23 | notice in file |
 | `dat/Apo-loca.lua` | added | 2026-07-31 to 2026-08-21 | notice in file |
 | `dat/Apo-strt.lua` | added | 2026-07-31 to 2026-08-21 | notice in file |
+| `dat/opthelp` | changed | 2026-09-25 | cannot carry a comment; listed here |
 | `dat/quest.lua` | changed | 2026-07-31 to 2026-09-23 | notice in file |
 | `include/artifact.h` | changed | 2026-08-21 | notice in file |
 | `include/artilist.h` | changed | 2026-07-31 to 2026-09-23 | notice in file |
 | `include/extern.h` | changed | 2026-08-16 to 2026-08-21 | notice in file |
+| `include/flag.h` | changed | 2026-09-25 | notice in file |
 | `include/hack.h` | changed | 2026-07-31 to 2026-09-25 | notice in file |
 | `include/monsters.h` | changed | 2026-07-31 to 2026-08-16 | notice in file |
 | `include/obj.h` | changed | 2026-09-23 | notice in file |
+| `include/objects.h` | changed | 2026-09-25 | notice in file |
+| `include/optlist.h` | changed | 2026-09-25 | notice in file |
 | `include/patchlevel.h` | changed | 2026-09-25 | notice in file |
 | `include/skills.h` | changed | 2026-08-16 | notice in file |
 | `src/artifact.c` | changed | 2026-08-21 to 2026-09-23 | notice in file |
@@ -34,13 +38,14 @@ notices before each release.
 | `src/mon.c` | changed | 2026-08-21 to 2026-09-23 | notice in file |
 | `src/monmove.c` | changed | 2026-09-23 | notice in file |
 | `src/muse.c` | changed | 2026-08-21 | notice in file |
+| `src/options.c` | changed | 2026-09-25 | notice in file |
 | `src/pager.c` | changed | 2026-09-25 | notice in file |
 | `src/pline.c` | changed | 2026-09-25 | notice in file |
 | `src/potion.c` | changed | 2026-08-10 to 2026-09-23 | notice in file |
 | `src/quest.c` | changed | 2026-09-23 | notice in file |
 | `src/report.c` | changed | 2026-09-25 | notice in file |
 | `src/role.c` | changed | 2026-07-31 to 2026-09-23 | notice in file |
-| `src/u_init.c` | changed | 2026-07-31 to 2026-09-24 | notice in file |
+| `src/u_init.c` | changed | 2026-07-31 to 2026-09-25 | notice in file |
 | `src/uhitm.c` | changed | 2026-08-16 to 2026-09-23 | notice in file |
 | `src/weapon.c` | changed | 2026-09-23 | notice in file |
 | `sys/android/Makefile.src` | changed | 2026-08-19 | notice in file |
@@ -56,3 +61,4 @@ notices before each release.
 | `sys/android/settings.gradle` | changed | 2026-09-23 | notice in file |
 | `sys/android/winandroid.c` | changed | 2026-09-23 to 2026-09-25 | notice in file |
 | `win/share/monsters.txt` | changed | 2026-08-04 to 2026-09-25 | notice in file |
+| `win/share/objects.txt` | changed | 2026-09-25 | notice in file |
