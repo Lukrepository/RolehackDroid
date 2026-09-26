@@ -1185,7 +1185,7 @@ staticfn void and_send_here_context(void)
  * doll ignores hallucination, as the core does for the hero's own glyph.
  *
  * Layout of the int array (RH_DOLL_LEN):
- *   [0] version (1)   [1] u.ux   [2] u.uy
+ *   [0] version (2)   [1] u.ux   [2] u.uy
  *   [3] tile of the hero's own glyph (hero_glyph: role, or race with showrace),
  *       or -1 when the doll must step aside (polymorphed, riding, engulfed,
  *       underwater, mimicking)
@@ -1193,14 +1193,34 @@ staticfn void and_send_here_context(void)
  *   helmet, suit, shirt, cloak, shield, gloves, boots, eyewear, amulet,
  *   weapon, off-hand weapon (only while two-weaponing).
  *   shape: 0 for anything that is not a weapon, else an RH_DOLL_* family,
- *   plus RH_DOLL_TWOHANDED.  A family is a function of the object type alone,
- *   and weapon appearances are never shuffled, so it tells nothing the tile
- *   does not.
+ *   plus RH_DOLL_TWOHANDED; RH_DOLL_HIDE for dragon scales, which the
+ *   interface cannot tell from a suit by the tile's shape; RH_DOLL_DRAGON
+ *   and the dragon's index (gray .. yellow) in bits 12-15 for dragon scale
+ *   mail, for its pauldrons.  All of these are functions of the object type
+ *   alone, and none of those appearances is ever shuffled, so they tell
+ *   nothing the tile does not.
+ *   RH_DOLL_FRONT marks the cloak-slot items worn in front of the body --
+ *   robe, apron (alchemy smock), mummy wrapping; every other cloak is drawn
+ *   as a cape behind it, so it no longer hides the armour (Lucas).  All
+ *   three have fixed appearances.
+ *   RH_DOLL_COSTUME marks a worn item the hero's own role tile already
+ *   draws (the Archeologist's fedora, the Knight's ring mail); the doll
+ *   leaves the tile alone for it.  Only when the player already knows the
+ *   item's type (oc_name_known -- starting kit is discovered at creation),
+ *   so it cannot tell a helm of telepathy from a plain helmet.
  *
- * Sent when the game waits for a command, and only when something changed.
+ *   then, from version 2, the skin: a seed that is fixed for the character
+ *   (a hash of ubirthday, which the save keeps) and the skintone option
+ *   (0 = random, else the tone the options file fixed).  The interface owns
+ *   the tones themselves; it has RH_SKINTONES of them.
+ *
+ * Sent when the game waits for a command, and when the hero's own square is
+ * drawn -- otherwise the welcome screens show the plain tile, and NetHack's
+ * own skin tone, until the first command (Lucas) -- and only when something
+ * changed.
  */
 #define RH_DOLL_SLOTS 11
-#define RH_DOLL_LEN (4 + 3 * RH_DOLL_SLOTS)
+#define RH_DOLL_LEN (4 + 3 * RH_DOLL_SLOTS + 2)
 #define RH_DOLL_SHORT_BLADE  1  /* dagger, knife */
 #define RH_DOLL_SWORD        2  /* short, broad, long sword, saber */
 #define RH_DOLL_GREAT_SWORD  3
@@ -1214,6 +1234,10 @@ staticfn void and_send_here_context(void)
 #define RH_DOLL_WHIP        11
 #define RH_DOLL_HORN        12  /* unicorn horn */
 #define RH_DOLL_TWOHANDED  0x100
+#define RH_DOLL_HIDE       0x200  /* dragon scales: a hide, not a shirt-shaped suit */
+#define RH_DOLL_COSTUME    0x400  /* the role tile already draws this item */
+#define RH_DOLL_DRAGON     0x800  /* dragon scale mail; index in bits 12-15 */
+#define RH_DOLL_FRONT    0x10000  /* robe, apron, mummy wrapping: worn in front */
 
 staticfn int rh_doll_family(struct obj *obj)
 {
@@ -1245,7 +1269,45 @@ staticfn int rh_doll_family(struct obj *obj)
     }
 }
 
-staticfn void rh_doll_slot(int *out, struct obj *obj)
+/*
+ * What each role's tile already wears, among its starting kit (Lucas: "some
+ * of the other base roles have similar clothing which is already represented
+ * on model").  Only unshared appearances: no small shield, whose "wooden
+ * shield" look two other shields share.
+ */
+static const struct {
+    short role, otyp;
+} rh_costume[] = {
+    { PM_ARCHEOLOGIST, FEDORA },
+    { PM_ARCHEOLOGIST, LEATHER_JACKET },
+    { PM_APOTHECARY, ALCHEMY_SMOCK },
+    { PM_APOTHECARY, HIGH_BOOTS },
+    { PM_APOTHECARY, LENSES },
+    { PM_CAVE_DWELLER, LEATHER_ARMOR },
+    { PM_KNIGHT, RING_MAIL },
+    { PM_KNIGHT, HELMET },
+    { PM_MONK, ROBE },
+    { PM_CLERIC, ROBE },
+    { PM_ROGUE, LEATHER_ARMOR },
+    { PM_SAMURAI, SPLINT_MAIL },
+    { PM_TOURIST, HAWAIIAN_SHIRT },
+    { PM_WIZARD, CLOAK_OF_MAGIC_RESISTANCE },
+};
+
+staticfn boolean rh_doll_costume(struct obj *obj)
+{
+    int i;
+
+    /* showrace draws the race's tile, which wears none of the role's kit */
+    if(flags.showrace || !objects[obj->otyp].oc_name_known)
+        return FALSE;
+    for(i = 0; i < SIZE(rh_costume); ++i)
+        if(rh_costume[i].role == Role_switch && rh_costume[i].otyp == obj->otyp)
+            return TRUE;
+    return FALSE;
+}
+
+staticfn void rh_doll_slot(int *out, struct obj *obj, boolean worn)
 {
     glyph_info gi;
     int glyph;
@@ -1269,10 +1331,16 @@ staticfn void rh_doll_slot(int *out, struct obj *obj)
     map_glyphinfo(0, 0, glyph, 0, &gi);
     out[0] = gi.gm.tileidx;
     out[1] = nhcolor_to_RGB(gi.gm.sym.color);
-    out[2] = rh_doll_family(obj) | (bimanual(obj) ? RH_DOLL_TWOHANDED : 0);
+    out[2] = rh_doll_family(obj) | (bimanual(obj) ? RH_DOLL_TWOHANDED : 0)
+             | (Is_dragon_scales(obj) ? RH_DOLL_HIDE : 0)
+             | (worn && rh_doll_costume(obj) ? RH_DOLL_COSTUME : 0);
+    if(Is_dragon_mail(obj))
+        out[2] |= RH_DOLL_DRAGON | ((obj->otyp - GRAY_DRAGON_SCALE_MAIL) << 12);
+    if(obj->otyp == ROBE || obj->otyp == ALCHEMY_SMOCK || obj->otyp == MUMMY_WRAPPING)
+        out[2] |= RH_DOLL_FRONT;
 }
 
-staticfn void and_send_hero_look(void)
+staticfn void and_send_hero_look(boolean from_display)
 {
     static int last[RH_DOLL_LEN];
     int look[RH_DOLL_LEN];
@@ -1280,14 +1348,18 @@ staticfn void and_send_hero_look(void)
     int i;
     jintArray arr;
 
-    if(!jHeroLook || !program_state.in_moveloop || !isok(u.ux, u.uy))
+    if(!jHeroLook || !isok(u.ux, u.uy) || program_state.gameover)
+        return;
+    /* A command prompt can come before there is a hero to dress; a drawn
+       hero square cannot. */
+    if(!from_display && !program_state.in_moveloop)
         return;
 
     slots[0] = uarmh; slots[1] = uarm; slots[2] = uarmu; slots[3] = uarmc;
     slots[4] = uarms; slots[5] = uarmg; slots[6] = uarmf; slots[7] = ublindf;
     slots[8] = uamul; slots[9] = uwep; slots[10] = u.twoweap ? uswapwep : 0;
 
-    look[0] = 1;
+    look[0] = 2;
     look[1] = u.ux;
     look[2] = u.uy;
     if(Upolyd || u.usteed || u.uswallow || Underwater || U_AP_TYPE != M_AP_NOTHING)
@@ -1300,7 +1372,11 @@ staticfn void and_send_hero_look(void)
         look[3] = gi.gm.tileidx;
     }
     for(i = 0; i < RH_DOLL_SLOTS; ++i)
-        rh_doll_slot(&look[4 + 3 * i], slots[i]);
+        rh_doll_slot(&look[4 + 3 * i], slots[i], i < 9);    /* 9, 10: in hand */
+    /* Knuth's multiplicative hash, high bits: games started seconds apart
+       should not just step through the tones in order. */
+    look[RH_DOLL_LEN - 2] = (int) ((((unsigned) ubirthday) * 2654435761U) >> 16);
+    look[RH_DOLL_LEN - 1] = iflags.rh_skintone;
 
     if(!memcmp(look, last, sizeof look))
         return;
@@ -1696,6 +1772,10 @@ void and_print_glyph(winid wid, coordxy x, coordxy y, const glyph_info *glyphinf
     int tile = glyphinfo->gm.tileidx;
     unsigned int special = glyphinfo->gm.glyphflags;
 
+    /* Rolehack: the doll's look goes out before the hero is drawn */
+    if(wid == WIN_MAP && (special & MG_HERO))
+        and_send_hero_look(TRUE);
+
     special &= ~(MG_CORPSE|MG_INVIS|MG_RIDDEN|MG_STATUE); // TODO support
     if(!iflags.hilite_pet)
         special &= ~MG_PET;
@@ -1789,7 +1869,7 @@ int and_nh_poskey(coordxy *x, coordxy *y, int *mod)
     //debuglog("and_nh_poskey");
     jintArray a;
 
-    and_send_hero_look();   /* Rolehack: the paper doll */
+    and_send_hero_look(FALSE);   /* Rolehack: the paper doll */
     a = (*jEnv)->NewIntArray(jEnv, 2);
     int c = JNICallI(jReceivePosKey, bMouseLock, a);
     if(!c)

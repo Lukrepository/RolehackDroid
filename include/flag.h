@@ -1,4 +1,5 @@
 /* NetHack 5.0	flag.h	$NHDT-Date: 1781973080 2026/06/20 16:31:20 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.265 $ */
+/* Changed for Rolehack by Lucas Ruiz, 2026-09-25.  See ROLEHACK-CHANGES.md. */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -248,7 +249,14 @@ enum debug_fuzzer_states {
  * to control the internal behavior of various NetHack functions
  * and probably warrant a structure of their own elsewhere some day.
  */
+/* ROLEHACK: skin tones the paper doll offers; RhDoll.TONES has this many. */
+#define RH_SKINTONES 8
+
 struct instance_flags {
+    int rh_skintone;       /* ROLEHACK: hero's skin tone on the paper doll:
+                            * 0 = random, fixed per character (from
+                            * ubirthday); 1..RH_SKINTONES = set in the
+                            * options file.  Never a choice at creation. */
     boolean defer_plname;  /* X11 hack: askname() might not set svp.plname */
     boolean fuzzerpending; /* fuzzing requested on command line but not active
                             * yet (to allow interactive initialization prior

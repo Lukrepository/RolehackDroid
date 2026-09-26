@@ -1,4 +1,5 @@
 /* NetHack 5.0	optlist.h */
+/* Changed for Rolehack by Lucas Ruiz, 2026-09-25.  See ROLEHACK-CHANGES.md. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef OPTLIST_H
@@ -686,6 +687,10 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(silent, Advanced, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &flags.silent, Term_False,
            "don't use terminal bell")
+    /* ROLEHACK */
+    NHOPTC(skintone, Advanced, 8, opt_in, set_in_config,
+                No, Yes, No, No, NoAlias,
+                "hero's skin tone: 1 (fairest) to 8 (deepest), or random")
     NHOPTB(softkeyboard, Advanced, 0, opt_in, set_in_config,
                 Off, Yes, No, No, NoAlias, &iflags.wc2_softkeyboard,
            Term_False, (char *)0)

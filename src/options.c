@@ -1,4 +1,5 @@
 /* NetHack 5.0	options.c	$NHDT-Date: 1778886716 2026/05/15 15:11:56 $  $NHDT-Branch: NetHack-5.0 $:$NHDT-Revision: 1.782 $ */
+/* Changed for Rolehack by Lucas Ruiz, 2026-09-25.  See ROLEHACK-CHANGES.md. */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3855,6 +3856,51 @@ optfn_soundlib(
     if (req == get_val || req == get_cnf_val) {
         get_soundlib_name(soundlibbuf, WINTYPELEN);
         Sprintf(opts, "%s", soundlibbuf);
+        return optn_ok;
+    }
+    return optn_ok;
+}
+
+/*
+ * ROLEHACK: the hero's skin tone on the paper doll (Lucas, 2026-09-25).
+ * Unset, every character gets one at random, fixed for that character, and it
+ * is never a choice at creation -- like much of real life.  Players who want
+ * their hero to look a particular way can fix it here, in the options file:
+ * OPTIONS=skintone:4.  Config-file only, and kept in iflags, so it is not saved.
+ */
+staticfn int
+optfn_skintone(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
+{
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+        if (negated) {
+            bad_negation(allopt[optidx].name, FALSE);
+            return optn_err;
+        }
+        op = string_for_opt(opts, FALSE);
+        if (op == empty_optstr || !strcmpi(op, "random")) {
+            iflags.rh_skintone = 0;
+        } else {
+            int n = atoi(op);
+
+            if (n < 1 || n > RH_SKINTONES) {
+                config_error_add("Illegal %s value '%s': 1 to %d, or random",
+                                 allopt[optidx].name, op, RH_SKINTONES);
+                return optn_err;
+            }
+            iflags.rh_skintone = n;
+        }
+        return optn_ok;
+    }
+    if (req == get_val || req == get_cnf_val) {
+        if (iflags.rh_skintone)
+            Sprintf(opts, "%d", iflags.rh_skintone);
+        else
+            Strcpy(opts, "random");
         return optn_ok;
     }
     return optn_ok;
