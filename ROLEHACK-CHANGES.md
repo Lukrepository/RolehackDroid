@@ -48,11 +48,11 @@ notices before each release.
 | `sys/android/app/AndroidManifest.xml` | changed | 2026-09-24 to 2026-09-25 | notice in file |
 | `sys/android/app/assets/ver` | changed | 2026-08-21 to 2026-09-25 | cannot carry a comment; listed here |
 | `sys/android/app/build.gradle` | changed | 2026-09-24 to 2026-09-25 | notice in file |
-| `sys/android/app/res/drawable-nodpi/default_16x16.png` | changed | 2026-08-19 | cannot carry a comment; listed here |
+| `sys/android/app/res/drawable-nodpi/default_16x16.png` | changed | 2026-08-19 to 2026-09-25 | cannot carry a comment; listed here |
 | `sys/android/app/res/drawable-nodpi/geoduck_15x25.png` | removed | 2026-08-19 to 2026-09-25 | file deleted |
 | `sys/android/app/res/drawable-nodpi/nevanda_32x32.png` | removed | 2026-08-19 to 2026-09-25 | file deleted |
 | `sys/android/app/res/values/config.xml` | changed | 2026-09-25 | notice in file |
 | `sys/android/app/res/values/tiles.xml` | changed | 2026-09-25 | notice in file |
 | `sys/android/settings.gradle` | changed | 2026-09-23 | notice in file |
 | `sys/android/winandroid.c` | changed | 2026-09-23 to 2026-09-25 | notice in file |
-| `win/share/monsters.txt` | changed | 2026-08-04 to 2026-08-19 | notice in file |
+| `win/share/monsters.txt` | changed | 2026-08-04 to 2026-09-25 | notice in file |

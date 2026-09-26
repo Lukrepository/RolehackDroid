@@ -1,5 +1,5 @@
 # monsters.txt - tile definitions for monsters
-# Changed for Rolehack by Lucas Ruiz, 2026-08-04 to 2026-08-19.  See ROLEHACK-CHANGES.md.
+# Changed for Rolehack by Lucas Ruiz, 2026-08-04 to 2026-09-25.  See ROLEHACK-CHANGES.md.
 #  Note: lines beginning with '# tile ' are not comments; other
 #  lines beginning with '#' are.
 . = (71, 108, 108)
@@ -13477,43 +13477,41 @@ Z = (195, 195, 195)
 }
 # tile 0 (apothecary,male)
 {
-  TTTTTTTTTTTTTTTT
-  TTTTTTTTTGWTTTTT
-  TTTTTTTGGWGTTTTT
-  TTTTTTGWWGATTTTT
-  TTTTTTGAAGATTTTT
-  TTTTTTGAAGATTTTT
-  TTTTTTWZZGTTTTTT
-  TTTTTTWAAGATAAAT
-  TTTTTGGWGGGAAAAT
-  TTTTWWWGGGGGAATT
-  TTTTZAGWWGAZAATT
-  TTTTTTGWWGAAAATT
-  TTTTTGWWWGAATATT
-  TTTTTGWWWWGATTTT
-  TTTTGWWWWWWGTTTT
-  TTTTTTTTTTTTTTTT
-}
+  ................
+  .........GW.....
+  .......GGWG.....
+  ......GWWGA.....
+  ......GAAGA.....
+  ......GAAGA.....
+  ......WZZG......
+  ......WAAGA.AAA.
+  .....GGWGGGAAAA.
+  ....WWWGGGGGAA..
+  ....ZAGWWGAZAA..
+  ......GWWGAAAA..
+  .....GWWWGAA.A..
+  .....GWWWWGA....
+  ....GWWWWWWG....
+  ................
 }
 # tile 0 (apothecary,female)
 {
-  TTTTTTTTTTTTTTTT
-  TTTTTTTTTGWTTTTT
-  TTTTTTTGGWGTTTTT
-  TTTTTTGWWGATTTTT
-  TTTTTTGAAGATTTTT
-  TTTTTTGAAGATTTTT
-  TTTTTTWZZGTTTTTT
-  TTTTTTWAAGATAAAT
-  TTTTTGGWGGGAAAAT
-  TTTTWWWGGGGGAATT
-  TTTTZAGWWGAZAATT
-  TTTTTTGWWGAAAATT
-  TTTTTGWWWGAATATT
-  TTTTTGWWWWGATTTT
-  TTTTGWWWWWWGTTTT
-  TTTTTTTTTTTTTTTT
-}
+  ................
+  .........GW.....
+  .......GGWG.....
+  ......GWWGA.....
+  ......GAAGA.....
+  ......GAAGA.....
+  ......WZZG......
+  ......WAAGA.AAA.
+  .....GGWGGGAAAA.
+  ....WWWGGGGGAA..
+  ....ZAGWWGAZAA..
+  ......GWWGAAAA..
+  .....GWWWGAA.A..
+  .....GWWWWGA....
+  ....GWWWWWWG....
+  ................
 }
 # tile 702 (Lord Carnarvon,male)
 {
@@ -14087,43 +14085,41 @@ Z = (195, 195, 195)
 }
 # tile 0 (Sir Isaac Newton,male)
 {
-  TTTTTTTJJTTTTTTT
-  TTTTTTDJJJTTTTTT
-  TTTTDDDDDJJJTTTT
-  TTTTTTLDLDATTTTT
-  TTTTTTLLLLATTTTT
-  TTTTTTALLATTTTTT
-  TTTTTDDAADDTAAAT
-  TTTTDDDDDDDDAAAT
-  TTTDDDDDDDJDDAAT
-  TTTDDADDDJADDAAT
-  TTTDADDDDJDADATT
-  TTTLADDDDJDALATT
-  TTTTTDDDAJDAAATT
-  TTTTTTDDAWAAAATT
-  TTTTTWWATWWATTTT
-  TTTTTTTTTTTTTTTT
-}
+  .......JJ.......
+  ......DJJJ......
+  ....DDDDDJJJ....
+  ......LDLDA.....
+  ......LLLLA.....
+  ......ALLA......
+  .....DDAADD.AAA.
+  ....DDDDDDDDAAA.
+  ...DDDDDDDJDDAA.
+  ...DDADDDJADDAA.
+  ...DADDDDJDADA..
+  ...LADDDDJDALA..
+  .....DDDAJDAAA..
+  ......DDAWAAAA..
+  .....WWA.WWA....
+  ................
 }
 # tile 0 (Sir Isaac Newton,female)
 {
-  TTTTTTTJJTTTTTTT
-  TTTTTTDJJJTTTTTT
-  TTTTDDDDDJJJTTTT
-  TTTTTTLDLDATTTTT
-  TTTTTTLLLLATTTTT
-  TTTTTTALLATTTTTT
-  TTTTTDDAADDTAAAT
-  TTTTDDDDDDDDAAAT
-  TTTDDDDDDDJDDAAT
-  TTTDDADDDJADDAAT
-  TTTDADDDDJDADATT
-  TTTLADDDDJDALATT
-  TTTTTDDDAJDAAATT
-  TTTTTTDDAWAAAATT
-  TTTTTWWATWWATTTT
-  TTTTTTTTTTTTTTTT
-}
+  .......JJ.......
+  ......DJJJ......
+  ....DDDDDJJJ....
+  ......LDLDA.....
+  ......LLLLA.....
+  ......ALLA......
+  .....DDAADD.AAA.
+  ....DDDDDDDDAAA.
+  ...DDDDDDDJDDAA.
+  ...DDADDDJADDAA.
+  ...DADDDDJDADA..
+  ...LADDDDJDALA..
+  .....DDDAJDAAA..
+  ......DDAWAAAA..
+  .....WWA.WWA....
+  ................
 }
 # tile 732 (Minion of Huhetotl,male)
 {
@@ -14623,83 +14619,79 @@ Z = (195, 195, 195)
 }
 # tile 0 (William Chaloner,male)
 {
-  0000000000000000
-  000000AAA0000000
-  00000AAAAA000000
-  00000AHAHA000000
-  00000AAAAA000000
-  0000AAAAAAA00000
-  0000AAAAAAA00000
-  000AAAAAAAAA0000
-  000AAAAAAAAA0000
-  00AAAAAAAAAAA000
-  00AAAAAAAAAAA000
-  000AAAAAAAAA0000
-  000AAAAAAAAAA000
-  00AAAAAAAAAAAA00
+  ................
+  ......AAA.......
+  .....AAAAA......
+  .....AHAHA......
+  .....AAAAA......
+  ....AAAAAAA.....
+  ....AAAAAAA.....
+  ...AAAAAAAAA....
+  ...AAAAAAAAA....
+  ..AAAAAAAAAAA...
+  ..AAAAAAAAAAA...
+  ...AAAAAAAAA....
+  ...AAAAAAAAAA...
+  ..AAAAAAAAAAAA..
   AAAAAAAAAAAAAAAA
-  0000000000000000
-}
+  ................
 }
 # tile 0 (William Chaloner,female)
 {
-  0000000000000000
-  000000AAA0000000
-  00000AAAAA000000
-  00000AHAHA000000
-  00000AAAAA000000
-  0000AAAAAAA00000
-  0000AAAAAAA00000
-  000AAAAAAAAA0000
-  000AAAAAAAAA0000
-  00AAAAAAAAAAA000
-  00AAAAAAAAAAA000
-  000AAAAAAAAA0000
-  000AAAAAAAAAA000
-  00AAAAAAAAAAAA00
+  ................
+  ......AAA.......
+  .....AAAAA......
+  .....AHAHA......
+  .....AAAAA......
+  ....AAAAAAA.....
+  ....AAAAAAA.....
+  ...AAAAAAAAA....
+  ...AAAAAAAAA....
+  ..AAAAAAAAAAA...
+  ..AAAAAAAAAAA...
+  ...AAAAAAAAA....
+  ...AAAAAAAAAA...
+  ..AAAAAAAAAAAA..
   AAAAAAAAAAAAAAAA
-  0000000000000000
-}
+  ................
 }
 # tile 0 (assayer,male)
 {
-  TTTTTTTTTTTTTTTT
-  TTTTTTTTTTTTTTTT
-  TTTTTCCJCCTTTTTT
-  TTTTTTTCTTTTTTTT
-  TTTTTTNCNCTTTTTT
-  TTTCCCCCCCCTTTTT
-  TTTTTTLCLCATTTTT
-  TTTTTTLLLLATTTTT
-  TTTTTTALLATTTTTT
-  TTTTTCKAAKJTAAAT
-  TTTTCKKKJJJJAAAT
-  TTTTKACKJJAJAAAT
-  TTTTLACJKJALAAAT
-  TTTTTKCJAJJATATT
-  TTTTTCJJTJKJTTTT
-  TTTTTTTTTTTTTTTT
-}
+  ................
+  ................
+  .....CCJCC......
+  .......C........
+  ......NCNC......
+  ...CCCCCCCC.....
+  ......LCLCA.....
+  ......LLLLA.....
+  ......ALLA......
+  .....CKAAKJ.AAA.
+  ....CKKKJJJJAAA.
+  ....KACKJJAJAAA.
+  ....LACJKJALAAA.
+  .....KCJAJJA.A..
+  .....CJJ.JKJ....
+  ................
 }
 # tile 0 (assayer,female)
 {
-  TTTTTTTTTTTTTTTT
-  TTTTTTTTTTTTTTTT
-  TTTTTCCJCCTTTTTT
-  TTTTTTTCTTTTTTTT
-  TTTTTTNCNCTTTTTT
-  TTTCCCCCCCCTTTTT
-  TTTTTTLCLCATTTTT
-  TTTTTTLLLLATTTTT
-  TTTTTTALLATTTTTT
-  TTTTTCKAAKJTAAAT
-  TTTTCKKKJJJJAAAT
-  TTTTKACKJJAJAAAT
-  TTTTLACJKJALAAAT
-  TTTTTKCJAJJATATT
-  TTTTTCJJTJKJTTTT
-  TTTTTTTTTTTTTTTT
-}
+  ................
+  ................
+  .....CCJCC......
+  .......C........
+  ......NCNC......
+  ...CCCCCCCC.....
+  ......LCLCA.....
+  ......LLLLA.....
+  ......ALLA......
+  .....CKAAKJ.AAA.
+  ....CKKKJJJJAAA.
+  ....KACKJJAJAAA.
+  ....LACJKJALAAA.
+  .....KCJAJJA.A..
+  .....CJJ.JKJ....
+  ................
 }
 # tile 0 (bribed constable,male)
 {
@@ -14720,7 +14712,6 @@ Z = (195, 195, 195)
   ................
   ................
 }
-}
 # tile 0 (bribed constable,female)
 {
   ................
@@ -14739,7 +14730,6 @@ Z = (195, 195, 195)
   .....PPAPPA.....
   ................
   ................
-}
 }
 # tile 758 (student,male)
 {
