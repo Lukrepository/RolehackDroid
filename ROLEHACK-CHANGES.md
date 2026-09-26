@@ -54,5 +54,5 @@ notices before each release.
 | `sys/android/app/res/values/config.xml` | changed | 2026-09-25 | notice in file |
 | `sys/android/app/res/values/tiles.xml` | changed | 2026-09-25 | notice in file |
 | `sys/android/settings.gradle` | changed | 2026-09-23 | notice in file |
-| `sys/android/winandroid.c` | changed | 2026-09-23 to 2026-09-24 | notice in file |
+| `sys/android/winandroid.c` | changed | 2026-09-23 to 2026-09-25 | notice in file |
 | `win/share/monsters.txt` | changed | 2026-08-04 to 2026-08-19 | notice in file |

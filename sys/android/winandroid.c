@@ -1,5 +1,5 @@
 #include <string.h>
-/* Changed for Rolehack by Lucas Ruiz, 2026-09-23 to 2026-09-24.  See ROLEHACK-CHANGES.md. */
+/* Changed for Rolehack by Lucas Ruiz, 2026-09-23 to 2026-09-25.  See ROLEHACK-CHANGES.md. */
 #include <errno.h>
 #include <jni.h>
 #include <ctype.h>
@@ -168,6 +168,7 @@ static jmethodID jGetDumplogDir;
 static jmethodID jStatusField;
 static jmethodID jPlayerInfo;
 static jmethodID jHereContext;
+static jmethodID jHeroLook;     /* Rolehack: the paper doll */
 
 static boolean quit_if_possible;
 static boolean restoring_msghistory;
@@ -277,6 +278,7 @@ void Java_com_tbd_forkfront_NetHackIO_RunNetHack(JNIEnv* env, jobject thiz, jstr
     jStatusField = rh_optional_method("statusField", "(I[BI)V");
     jPlayerInfo = rh_optional_method("setPlayerInfo", "([B[B[BI)V");
     jHereContext = rh_optional_method("hereContext", "(I[B)V");
+    jHeroLook = rh_optional_method("heroLook", "([I)V");
 
     if(!(jReceiveKey && jReceivePosKey && jCreateWindow && jClearWindow && jDisplayWindow &&
             jDestroyWindow && jPutString && jRawPrint && jSetCursorPos && jPrintTile &&
@@ -1171,6 +1173,145 @@ staticfn void and_send_here_context(void)
     destroy_jobject(jmon);
 }
 
+/*
+ * Rolehack: the paper doll -- what the hero is wearing and wielding.
+ *
+ * Every item goes out as the glyph the floor would show for it, never by what
+ * it really is.  The tile and the colour both follow the shuffled appearance
+ * (o_init.c: shuffle() swaps oc_color, shuffle_tiles() the tiles), so the doll
+ * shows no more than a glance at the floor would: "riding gloves", not
+ * gauntlets of power.  obj_to_glyph() is not used because its pile-top test
+ * reads the floor at the object's ox/oy, which are stale for inventory; and the
+ * doll ignores hallucination, as the core does for the hero's own glyph.
+ *
+ * Layout of the int array (RH_DOLL_LEN):
+ *   [0] version (1)   [1] u.ux   [2] u.uy
+ *   [3] tile of the hero's own glyph (hero_glyph: role, or race with showrace),
+ *       or -1 when the doll must step aside (polymorphed, riding, engulfed,
+ *       underwater, mimicking)
+ *   then RH_DOLL_SLOTS triples {tile or -1, RGB colour, shape}, in the order
+ *   helmet, suit, shirt, cloak, shield, gloves, boots, eyewear, amulet,
+ *   weapon, off-hand weapon (only while two-weaponing).
+ *   shape: 0 for anything that is not a weapon, else an RH_DOLL_* family,
+ *   plus RH_DOLL_TWOHANDED.  A family is a function of the object type alone,
+ *   and weapon appearances are never shuffled, so it tells nothing the tile
+ *   does not.
+ *
+ * Sent when the game waits for a command, and only when something changed.
+ */
+#define RH_DOLL_SLOTS 11
+#define RH_DOLL_LEN (4 + 3 * RH_DOLL_SLOTS)
+#define RH_DOLL_SHORT_BLADE  1  /* dagger, knife */
+#define RH_DOLL_SWORD        2  /* short, broad, long sword, saber */
+#define RH_DOLL_GREAT_SWORD  3
+#define RH_DOLL_AXE          4
+#define RH_DOLL_PICK         5
+#define RH_DOLL_BLUNT        6  /* club, mace, morning star, flail, hammer */
+#define RH_DOLL_STAFF        7
+#define RH_DOLL_POLE         8  /* polearms, spear, trident, lance */
+#define RH_DOLL_LAUNCHER     9  /* bow, sling, crossbow */
+#define RH_DOLL_MISSILE     10  /* ammo, darts, shuriken, boomerang */
+#define RH_DOLL_WHIP        11
+#define RH_DOLL_HORN        12  /* unicorn horn */
+#define RH_DOLL_TWOHANDED  0x100
+
+staticfn int rh_doll_family(struct obj *obj)
+{
+    int skill;
+
+    if(obj->oclass != WEAPON_CLASS && !is_weptool(obj))
+        return 0;
+    skill = objects[obj->otyp].oc_skill;
+    if(skill < 0)
+        return RH_DOLL_MISSILE;
+    switch(skill)
+    {
+    case P_DAGGER: case P_KNIFE:                        return RH_DOLL_SHORT_BLADE;
+    case P_SHORT_SWORD: case P_BROAD_SWORD:
+    case P_LONG_SWORD: case P_SABER:                    return RH_DOLL_SWORD;
+    case P_TWO_HANDED_SWORD:                            return RH_DOLL_GREAT_SWORD;
+    case P_AXE:                                         return RH_DOLL_AXE;
+    case P_PICK_AXE:                                    return RH_DOLL_PICK;
+    case P_CLUB: case P_MACE: case P_MORNING_STAR:
+    case P_FLAIL: case P_HAMMER:                        return RH_DOLL_BLUNT;
+    case P_QUARTERSTAFF:                                return RH_DOLL_STAFF;
+    case P_POLEARMS: case P_SPEAR: case P_TRIDENT:
+    case P_LANCE:                                       return RH_DOLL_POLE;
+    case P_BOW: case P_SLING: case P_CROSSBOW:          return RH_DOLL_LAUNCHER;
+    case P_DART: case P_SHURIKEN: case P_BOOMERANG:     return RH_DOLL_MISSILE;
+    case P_WHIP:                                        return RH_DOLL_WHIP;
+    case P_UNICORN_HORN:                                return RH_DOLL_HORN;
+    default:                                            return 0;
+    }
+}
+
+staticfn void rh_doll_slot(int *out, struct obj *obj)
+{
+    glyph_info gi;
+    int glyph;
+
+    if(!obj)
+    {
+        out[0] = -1, out[1] = 0, out[2] = 0;
+        return;
+    }
+    if(obj->otyp == CORPSE)
+        glyph = obj->corpsenm + GLYPH_BODY_OFF;
+    else if(obj->otyp == STATUE)
+        glyph = obj->corpsenm
+                + (((obj->spe & CORPSTAT_GENDER) == CORPSTAT_FEMALE)
+                   ? GLYPH_STATUE_FEM_OFF : GLYPH_STATUE_MALE_OFF);
+    else if(obj_is_generic(obj))
+        glyph = obj->oclass + GLYPH_OBJ_OFF;
+    else
+        glyph = obj->otyp + GLYPH_OBJ_OFF;
+
+    map_glyphinfo(0, 0, glyph, 0, &gi);
+    out[0] = gi.gm.tileidx;
+    out[1] = nhcolor_to_RGB(gi.gm.sym.color);
+    out[2] = rh_doll_family(obj) | (bimanual(obj) ? RH_DOLL_TWOHANDED : 0);
+}
+
+staticfn void and_send_hero_look(void)
+{
+    static int last[RH_DOLL_LEN];
+    int look[RH_DOLL_LEN];
+    struct obj *slots[RH_DOLL_SLOTS];
+    int i;
+    jintArray arr;
+
+    if(!jHeroLook || !program_state.in_moveloop || !isok(u.ux, u.uy))
+        return;
+
+    slots[0] = uarmh; slots[1] = uarm; slots[2] = uarmu; slots[3] = uarmc;
+    slots[4] = uarms; slots[5] = uarmg; slots[6] = uarmf; slots[7] = ublindf;
+    slots[8] = uamul; slots[9] = uwep; slots[10] = u.twoweap ? uswapwep : 0;
+
+    look[0] = 1;
+    look[1] = u.ux;
+    look[2] = u.uy;
+    if(Upolyd || u.usteed || u.uswallow || Underwater || U_AP_TYPE != M_AP_NOTHING)
+        look[3] = -1;
+    else
+    {
+        glyph_info gi;
+
+        map_glyphinfo(0, 0, hero_glyph, 0, &gi);
+        look[3] = gi.gm.tileidx;
+    }
+    for(i = 0; i < RH_DOLL_SLOTS; ++i)
+        rh_doll_slot(&look[4 + 3 * i], slots[i]);
+
+    if(!memcmp(look, last, sizeof look))
+        return;
+    memcpy(last, look, sizeof look);
+
+    arr = (*jEnv)->NewIntArray(jEnv, RH_DOLL_LEN);
+    (*jEnv)->SetIntArrayRegion(jEnv, arr, 0, RH_DOLL_LEN, look);
+    JNICallV(jHeroLook, arr);
+    destroy_jobject(arr);
+}
+
 staticfn void and_send_status_fields(void)
 {
     int idx;
@@ -1646,7 +1787,10 @@ void lock_mouse_cursor(boolean bLock)
 int and_nh_poskey(coordxy *x, coordxy *y, int *mod)
 {
     //debuglog("and_nh_poskey");
-    jintArray a = (*jEnv)->NewIntArray(jEnv, 2);
+    jintArray a;
+
+    and_send_hero_look();   /* Rolehack: the paper doll */
+    a = (*jEnv)->NewIntArray(jEnv, 2);
     int c = JNICallI(jReceivePosKey, bMouseLock, a);
     if(!c)
     {
